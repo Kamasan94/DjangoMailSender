@@ -3,27 +3,41 @@
   <head>
     <meta charset="utf-8">
     <title>Automatic email sender</title>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'MailSender/style.css' %}">
+    {% load static %} 
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">   
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'MailSender/style.css' %}">-->
   </head>
   <body>
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-    <form action="{% url 'MailSender:send' %}" method="post">
-    {% csrf_token %}
-    <fieldset>
-      <label>Message text</label>
-      <textarea rows = "5" cols = "60" name = "messageText" id="messageText"></textarea><br>
-    </fieldset>
-    <input type="submit" value="Send">
-    </form>
-    {% if mail_address_list %}
-    <ul>
-    {% for address in mail_address_list %}
-        <li>{{ address.address }}</a></li>
-    {% endfor %}
-    </ul>
-    {% else %}
-        <p>No address</p>
-    {% endif %}
+    <div class="container">
+      <div class="row">
+        <div class="col-sm">
+          <h2 class="text-center">Sending Emails with Python</h2>
+          <p class="text-center">Automate the process of sending emails with some customized features based on business requirements. You can have a list of email addresses and their respective names. Then you can modify the message and send emails to the target audience automatically.</p>
+          <script src="{% static 'js/bootstrap.bundle.js' %}"></script> 
+          {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+          <form action="{% url 'MailSender:send' %}" method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <fieldset>
+              <label for="messageText">Message text</label>
+              <textarea class="form-control" rows = "5" cols = "60" name = "messageText" id="messageText"></textarea><br>
+            </fieldset>
+            <button type="submit" class="btn btn-primary">Send</button>
+          </div>
+          </form>
+          
+          {% if mail_address_list %}
+          <ul>
+          {% for address in mail_address_list %}
+              <li>{{ address.address }}</a></li>
+          {% endfor %}
+          </ul>
+          {% else %}
+              <p>No address</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
   </body>
 </html>
