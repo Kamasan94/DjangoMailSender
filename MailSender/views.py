@@ -1,4 +1,4 @@
-import sendgrid
+import smtplib, ssl
 import os
 
 
@@ -7,8 +7,12 @@ from django.shortcuts import render
 from django.views import generic
 from django.http import HttpResponse
 
-from models import MailAddress
-from sendgrid.helpers.mail import Mail, Email, To, Content
+from .models import MailAddress
+
+port = 587 #For starttls
+smtp_server = "smtp.gmail.com"
+sender_email = "bdio59101@gmail.com"
+password = "5BL4wu8CqAfWbPA"
 
 class IndexView(generic.ListView):
     template_name = 'MailSender/index.html'
@@ -28,21 +32,16 @@ def send(request):
             'error_message': "Empty email text",
         })
     else:
-        my_sg = sendgrid.SendGridAPIClient('......IeltIytmFYeQ0aSOt2UBYvv2E6Xh...')
-        # Change to your verified sender
-        from_email = Email("pooldaimon94@gmail.com")  
-
-        # Change to your recipient
-        for email in MailAddress.objects.all():
-            to_email = To(email.address)  
-
-            subject = "Lorem ipsum dolor sit amet"
-            content = Content("text/plain", text)
-
-            mail = Mail(from_email, to_email, subject, content)
-
-            # Get a JSON-ready representation of the Mail object
-            mail_json = mail.get()
-
-            # Send an HTTP POST request to /mail/send
-            response = my_sg.client.mail.send.post(request_body=mail_json)
+        context = ssl.create_default_context()
+        for email in MailAddress.objects.all().values_list():
+            print(email[1])
+            with smtplib.SMTP(smtp_server, port) as server:
+                server.ehlo()  # Can be omitted
+                server.starttls(context=context)
+                server.ehlo()  # Can be omitted
+                server.login(sender_email, password)
+                server.sendmail(sender_email, email[1], text)
+        return render(request, 'MailSender/index.html',{
+            'mail_address_list': MailAddress.objects.all(),
+            'error_message': "Mail mandate?",
+        })
